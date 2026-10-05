@@ -16,8 +16,6 @@
 set -e
 
 # Configurable params
-PROVISION_UID=1000
-PROVISION_GID=1000
 PROVISION_USER="provision"
 PROVISION_GROUP="provision"
 MIN_UBUNTU_VERSION="24.04"
@@ -106,7 +104,6 @@ check_internet() {
         "https://auth.docker.io"
         "https://registry-1.docker.io"
         "https://download.docker.com"
-        "https://sentry.io"
         "https://fonts.gstatic.com"
         "https://storage.googleapis.com"
         "https://fonts.googleapis.com"
