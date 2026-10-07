@@ -56,29 +56,9 @@ jobs:
             base_branch="release/$x.$y.$((z - 1))"
           fi
 
-          target="${{ inputs.target_branch }}"
-          if [ -z "$target" ]; then
-            target=master
-          fi
-
-          if [ "$target" = "master" ]; then
-            merge_back=develop
-          else
-            merge_back="$target"
-          fi
-
-          # Dots are stripped so the name passes the branch-name check used
-          # across the repos: 1.9.17 into 2.0.2 -> merge-back/release-1917-into-202.
-          slug="${merge_back#release/}"
-          echo "$VERSION -> $target, merging back into $merge_back"
-          echo "base_branch=$base_branch" >> $GITHUB_OUTPUT
-          echo "target_branch=$target" >> $GITHUB_OUTPUT
-          echo "merge_back_target=$merge_back" >> $GITHUB_OUTPUT
-          echo "mergeback_branch=merge-back/release-${VERSION//./}-into-${slug//./}" >> $GITHUB_OUTPUT
-
-      # Full history is required for the git operations below.
-      - name: Checkout ${{ steps.branches.outputs.base_branch }}
-        uses: actions/checkout@v4
+      # Full history is required so yarn can traverse the commit graph.
+      - name: Checkout ${{ steps.get_base_branch.outputs.base_branch }}
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.branches.outputs.base_branch }}
           fetch-depth: 0
@@ -120,7 +100,7 @@ jobs:
             -e "s/^\(\s*DEPENDENCIES_CHART_VERSION:\s*\).*/\1\"v$VERSION\"/" \
             .github/workflows/deploy-dependencies.yml
           # Bump package.json without creating a git tag.
-          yarn version --new-version ${{ inputs.version }} --no-git-tag-version
+          npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version
           git add .
           git commit -m "chore: update version to $VERSION"
 

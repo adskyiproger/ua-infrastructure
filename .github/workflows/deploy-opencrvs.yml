@@ -16,11 +16,11 @@ on:
       core-image-tag:
         description: "Tag of the core image"
         required: true
-        default: "v2.0.4"
+        default: "v2.1.0"
       countryconfig-image-tag:
         description: "Tag of the countryconfig image"
         required: true
-        default: "v2.0.4"
+        default: "v2.1.0"
       data-seed-enabled:
         description: "Data seeding during deployment"
         required: false
@@ -36,11 +36,11 @@ on:
 
 env:
   # Assuming chart version matches core image tag
-  OPENCRVS_CHART_VERSION: "v2.0.4"
+  OPENCRVS_CHART_VERSION: "v2.1.0"
 jobs:
   approve:
     environment: ${{ inputs.environment }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
       - name: Waiting for manual approval
@@ -67,8 +67,17 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
     secrets: inherit
+  validate-predeploy:
+    uses: ./.github/workflows/validate-opencrvs.yml
+    with:
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.core-image-tag }}
+      stage: predeploy
+    secrets: inherit
   deploy:
-    needs: github-to-k8s-sync-env
+    needs:
+      - github-to-k8s-sync-env
+      - validate-predeploy
     environment: ${{ inputs.environment }}
     env:
       ENV: ${{ inputs.environment }}
@@ -84,7 +93,7 @@ jobs:
       - k8s
       - ${{ inputs.environment }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Generate summary
         env:
           PUBLIC_DOMAIN: ${{ vars.DOMAIN }}
@@ -117,7 +126,6 @@ jobs:
             "elasticsearch-admin-user"
             "redis-opencrvs-users"
             "minio-opencrvs-users"
-            "mongodb-admin-user"
             "postgres-admin-user"
           )
           for secret in "${secrets[@]}"; do
@@ -189,3 +197,11 @@ jobs:
                --fail \
                --silent \
                --show-error || echo "Error: Failed to reach countryconfig service"
+  validate-postdeploy:
+    needs: deploy
+    uses: ./.github/workflows/validate-opencrvs.yml
+    with:
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.core-image-tag }}
+      stage: postdeploy
+    secrets: inherit

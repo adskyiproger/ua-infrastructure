@@ -60,10 +60,13 @@ done
 
 check_ubuntu_version() {
     echo "Checking Ubuntu version..."
+
     UBUNTU_VERSION=$(lsb_release -rs)
-    if [ "$UBUNTU_VERSION" != "$MIN_UBUNTU_VERSION" ]; then
-      abort "Ubuntu $MIN_UBUNTU_VERSION is required, found $UBUNTU_VERSION"
+
+    if ! dpkg --compare-versions "$UBUNTU_VERSION" ge "$MIN_UBUNTU_VERSION"; then
+        abort "Ubuntu $MIN_UBUNTU_VERSION or newer is required, found $UBUNTU_VERSION"
     fi
+
     echo "Ubuntu version OK."
 }
 
@@ -96,7 +99,7 @@ curl_check_url() {
 check_internet() {
     local urls=(
         "https://raw.githubusercontent.com/"
-        "https://get.helm.sh"
+        "https://packages.buildkite.com"
         "https://pkgs.k8s.io"
         "https://archive.ubuntu.com"
         "https://changelogs.ubuntu.com"
@@ -104,6 +107,7 @@ check_internet() {
         "https://auth.docker.io"
         "https://registry-1.docker.io"
         "https://download.docker.com"
+        "https://sentry.io"
         "https://fonts.gstatic.com"
         "https://storage.googleapis.com"
         "https://fonts.googleapis.com"
