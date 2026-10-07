@@ -5,6 +5,14 @@
 ## 2.0.3 Release Candidate
 
 ## 2.0.2 Release Candidate
+## 2.1.0 Release
+
+### Improvements
+
+- Added Ubuntu 26.04 support to OpenCRVS infrastructure [#13111](https://github.com/opencrvs/opencrvs-core/issues/13111)
+- Upgraded Kubernetes to v1.36 [#13177](https://github.com/opencrvs/opencrvs-core/issues/13177)
+- Upgraded Traefik helm chart to 41.0.2 [#13291](https://github.com/opencrvs/opencrvs-core/issues/13291)
+- Retrieve ENCRYPTION_KEY from backup server [#10927](https://github.com/opencrvs/opencrvs-core/issues/10927)
 
 ### Bug fixes
 
@@ -15,6 +23,7 @@
 ### Improvements
 
 - Sentry has been removed from OpenCRVS, so `sentry.io` no longer has to be reachable for `opencrvs-bootstrap.sh` to pass its connectivity check. If you allowlist outbound traffic, you can drop it. Environment setup no longer asks for a Sentry DSN. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+## 2.0.2 Release
 
 ## 2.0.1 Release
 
@@ -27,9 +36,3 @@
 - Always restart the Kubernetes self-hosted runner during deployment to ensure the latest runner image and configuration changes are applied. [#332](https://github.com/opencrvs/infrastructure/pull/332)
 - Testing outbound HTTPS connectivity instead of ping [#338](https://github.com/opencrvs/infrastructure/pull/338)
 - Run differencial backup as non-root user after pgbackrest upgrade [#360](https://github.com/opencrvs/infrastructure/pull/360) [#13370](https://github.com/opencrvs/opencrvs-core/pull/13370)
-
-## 1.9.14 Release Candidate
-
-### Fixes
-
-- Improved internet connectivity checks by replacing ICMP ping with HTTPS endpoint validation and detailed diagnostics for restricted environments.
